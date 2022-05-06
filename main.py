@@ -8,7 +8,14 @@ for filename in os.listdir("docx"):
 
     path_output = f"txt/{name}.txt"
 
-    pypandoc.convert_file(path_input, 'plain', outputfile=path_output)
+    try:
+        pypandoc.convert_file(path_input, 'plain', outputfile=path_output)
+    except:
+        file = open("result/uncounted.txt", "w")
+        file.write(f"{filename}\n")
+        file.close()
+
+
 
 # Подсчитываем кол-во символов в файлах
 # Результаты заносим в файлы txt и word
@@ -25,7 +32,7 @@ row = 0
 for filename in os.listdir("txt"):
    with open(os.path.join("txt", filename), 'r', encoding='utf-8') as f:
        data = f.read()
-       data_format =  re.sub(r"\s\s+|\n|-", "", data)
+       data_format = re.sub(r"\s\s+|\n|-", "", data)
        number_of_characters = len(data_format)
        result = f"{filename} {number_of_characters}\n"
        file.write(result)
