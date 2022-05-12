@@ -1,10 +1,21 @@
-import docx, os, pypandoc, re
+import docx, os, pypandoc, re, glob
+
+# Удаление всех файлов из папки txt
+for file in glob.glob("txt/*"):
+    os.remove(file)
 
 #Получаем все файлы ворд из папки docx. Преобразуем в txt и кладем в папку txt
+
+file_uncounted = open("result/uncounted.txt", "w")
+file_uncounted.write("Файлы, в которых символы не подсчитались:\n")
+
 for filename in os.listdir("docx"):
     path_input = f"docx/{filename}"
     doc = docx.Document(path_input)
-    name = doc.paragraphs[0].text
+
+    # Имя файла или заголовок в документе
+    #name = doc.paragraphs[0].text
+    name = filename
 
     path_output = f"txt/{name}.txt"
 
@@ -13,9 +24,8 @@ for filename in os.listdir("docx"):
     except:
         file = open("result/uncounted.txt", "w")
         file.write(f"{filename}\n")
-        file.close()
 
-
+file_uncounted .close()
 
 # Подсчитываем кол-во символов в файлах
 # Результаты заносим в файлы txt и word
@@ -27,22 +37,24 @@ table = doc.add_table(rows = count_files, cols = 3)
 table.style = 'Table Grid'
 
 
-file = open("result/result.txt", "w")
+file_result = open("result/result.txt", "w")
 row = 0
+
+
 for filename in os.listdir("txt"):
    with open(os.path.join("txt", filename), 'r', encoding='utf-8') as f:
        data = f.read()
        data_format = re.sub(r"\s\s+|\n|-", "", data)
        number_of_characters = len(data_format)
        result = f"{filename} {number_of_characters}\n"
-       file.write(result)
+       file_result.write(result)
 
        table.cell(row, 0).text = str(row + 1)
-       table.cell(row, 1).text = filename
+       table.cell(row, 1).text = re.sub(r"\.docx|\.txt", "", filename)
        table.cell(row, 2).text = str(number_of_characters)
        row += 1
 
-file.close()
+file_result.close()
 doc.save('result/result.docx')
 
 
